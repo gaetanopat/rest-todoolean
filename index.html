@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.2/handlebars.min.js"></script>
+    <title></title>
+  </head>
+  <body>
+
+    <div class="container">
+      <div class="new_todo">
+        <input id="input_new_todo" type="text" placeholder="Inserisci nuovo compito">
+        <a id="link_new_todo" onclick="return false" href="#">Aggiungi alla lista</a>
+      </div>
+      <div class="edit_todo">
+        <select class="" name="">
+        </select>
+        <input id="input_edit_todo" type="text" placeholder="Compito sostitutivo">
+        <a id="link_edit_todo" onclick="return false" href="#">Modifica compito</a>
+      </div>
+      <ul class="list">
+      </ul>
+    </div>
+
+    <script src="main.js"></script>
+    <script id="template_list" type="text/x-handlebars-template">
+      <li data-id="{{id}}">{{compito}} <i class="fas fa-times"></i></li>
+    </script>
+    <script id="template_select" type="text/x-handlebars-template">
+      <option value="{{id}}">{{compito}}</option>
+    </script>
+  </body>
+</html>

@@ -1,15 +1,37 @@
 $(document).ready(function(){
-  var url_base = 'http://157.230.17.132:3011/todos/';
+  var url_base = 'http://157.230.17.132:3011/todos/'
 
+  // visualizzo i compiti
   visualizzaCompiti(url_base);
-  inserisciNuovoCompito(url_base);
-  modificaCompito(url_base);
-  eliminaCompito(url_base);
+
+  // quando clicco sul tasto 'Aggiungi alla lista'
+  $('#link_new_todo').click(function(){
+    aggiungiCompito(url_base);
+  });
+
+  // quando clicco sulla 'X'
+  $('ul.list').on('click', 'i', function(){
+    // prendo l'id dell'li
+    var compito_da_eliminare = $(this).parent('li').attr('data-id');
+    eliminaCompito(url_base, compito_da_eliminare);
+  });
+
+  // quando clicco su 'Modifica compito'
+  $('#link_edit_todo').click(function(){
+    // prendo il valore dell'input text
+    var compito_modificato = $('#input_edit_todo').val();
+    // prendo il value dell'opzione selezionata
+    var compito_selezionato = $('select').val();
+    // se l'utente ha scritto qualcosa
+    if(compito_modificato.length > 0){
+      modificaCompito(url_base, compito_modificato, compito_selezionato);
+    };
+  });
 });
 
-// per visualizzare i compiti
+// funzione per visualizzare i compiti
 function visualizzaCompiti(url){
-  // codice da clonare
+  //codice da clonare
   var list_item = $('#template_list').html();
   // funzione compilatrice
   var template_list_item_function = Handlebars.compile(list_item);
@@ -27,12 +49,11 @@ function visualizzaCompiti(url){
   $.ajax({
     url: url,
     method: 'get',
-    success: function (data, stato) {
+    success: function(data){
       console.log(data);
       var item_list;
       $('select').append('<option value="">Seleziona</option>');
-
-      for (var i = 0; i < data.length; i++){
+      for (var i = 0; i < data.length; i++) {
         item_list = {
           id: data[i].id,
           compito: data[i].text
@@ -43,83 +64,62 @@ function visualizzaCompiti(url){
         $('select').append(html2);
       }
     },
-    error: function (richiesta, stato, errori) {
-      alert("E' avvenuto un errore. " + errore);
+    error: function(){
+      alert('errore');
+    }
+  });
+};
+
+// funzione per aggiungere un compito
+function aggiungiCompito(url){
+  // prendo il testo dell'input text
+  var input_compito = $('#input_new_todo').val();
+  $.ajax({
+    url: url,
+    method: 'post',
+    data: {
+      text: input_compito
+    },
+    success: function(data){
+      visualizzaCompiti(url);
+    },
+    error: function(){
+      alert('errore');
+    }
+  });
+  // azzero l'input text
+  $('#input_new_todo').val('');
+};
+
+// funzione per eliminare un compito
+function eliminaCompito(url, id_compito){
+  $.ajax({
+    url: url + id_compito,
+    method: 'delete',
+    success: function(data){
+      visualizzaCompiti(url);
+    },
+    error: function(){
+      alert('errore');
     }
   });
 }
 
-// per inserire un nuovo compito
-function inserisciNuovoCompito(url){
-  // quando clicco su Aggiungi alla lista
-  $('#link_new_todo').click(function(){
-    // prendo il testo della input text
-    var input_todo = $('#input_new_todo').val();
-    console.log(input_todo);
-    // azzero l'input text
-    $('#input_new_todo').val('');
-    $.ajax({
-      url: url,
-      method: 'post',
-      data: {
-        text: input_todo
-      },
-      success: function (data) {
-        visualizzaCompiti(url);
-      },
-      error: function (richiesta, stato, errori) {
-        alert("E' avvenuto un errore. " + errore);
-      }
-    });
+// funzione per modificare un compito
+function modificaCompito(url, testo_da_inserire, id_compito){
+  $.ajax({
+    url: url + id_compito,
+    method: 'put',
+    data: {
+      text: testo_da_inserire
+    },
+    success: function(data){
+      visualizzaCompiti(url);
+    },
+    error: function(){
+      alert('errore');
+    }
   });
-};
-
-// per modificare un compito
-function modificaCompito(url){
-  // quando cambio opzione
-  $('select').change(function(){
-    var opzione_selezionata = $(this).children("option:selected").val();
-    console.log(opzione_selezionata);
-    // quando clicco su Modifica compito
-    $('#link_edit_todo').click(function(){
-      // prendo il valore di quello che scrive l'utente nell'input text
-      var compito_sostitutivo = $('#input_edit_todo').val();
-      console.log(compito_sostitutivo);
-      // azzero l'input text
-      $('#input_edit_todo').val('');
-      $.ajax({
-        url: url + opzione_selezionata,
-        method: 'put',
-        data: {
-          text: compito_sostitutivo
-        },
-        success: function (data) {
-          console.log(data);
-          visualizzaCompiti(url);
-        },
-        error: function (richiesta, stato, errori) {
-          alert("E' avvenuto un errore. " + errore);
-        }
-      });
-    });
-  });
-};
-
-// per eliminare un compito
-function eliminaCompito(url){
-  // quando clicco su un'icona
-  $('ul').on('click', 'i', function(){
-    // prendo l'id dell'item da cancellare
-    var item_to_delete = $(this).parent('li').attr('data-id');
-    $.ajax({
-      url: url + item_to_delete,
-      method: 'delete',
-      success: function (data) {
-        visualizzaCompiti(url);
-      },
-      error: function (richiesta, stato, errori) {
-        alert("E' avvenuto un errore. " + errore);
-      }
-    });
-  });
+  // azzero l'input text
+  $('#input_edit_todo').val('');
 };
